@@ -4,8 +4,9 @@ module.exports = {
     hello: (req, res) => {
         return res.render('home.ejs');
     },
-    handleUserPage: (req, res) => {
-        return res.render('user.ejs');
+    handleUserPage: async (req, res) => {
+        let users = await userService.getAllUsers();
+        return res.render('user.ejs', { users });
     },
     handleCreateUser: (req, res) => {
         const { email, password, username } = req.body;
