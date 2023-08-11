@@ -6,12 +6,19 @@ module.exports = {
     },
     handleUserPage: async (req, res) => {
         let users = await userService.getAllUsers();
+
         return res.render('user.ejs', { users });
     },
     handleCreateUser: (req, res) => {
         const { email, password, username } = req.body;
         userService.createUser(email, password, username);
 
-        return res.render('user.ejs');
+        return res.redirect('/user');
+    },
+    handleDeleteUser: (req, res) => {
+        const { id } = req.params;
+        userService.deleteUser(id);
+
+        return res.redirect('/user');
     }
 };
