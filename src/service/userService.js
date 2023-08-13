@@ -1,19 +1,7 @@
 import mysql from 'mysql2/promise';
 import bluebird from 'bluebird';
 import bcrypt from 'bcryptjs';
-
-// const connection = await mysql.createConnection({
-//     host: 'localhost',
-//     user: 'root',
-//     database: 'jwt',
-//     Promise: bluebird
-// });
-const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'jwt',
-    Promise: bluebird
-});
+import db from '../models/index';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -25,24 +13,30 @@ module.exports = {
     createUser: async (email, password, username) => {
         let hashedPassword = hashPassword(password);
         try {
-            const [rows, fields] = await connection.execute('insert into users (email, password, username) values (?, ?, ?)', [email, hashPassword, username]);
+            await db.User.create({
+                email,
+                password: hashedPassword,
+                username
+            });
         } catch (error) {
             console.log(error);
         }
     },
     getAllUsers: async () => {
-        let users = [];
+        let user = [];
         try {
-            const [rows, fields] = await connection.execute('select * from users');
-            return rows;
+            return await db.User.findAll();
         } catch (error) {
             console.log(error);
         }
     },
     deleteUser: async (id) => {
         try {
-            const [rows, fields] = await connection.execute('delete from users where id = ?', [id]);
-            return rows;
+            await db.User.destroy({
+                where: {
+                    id
+                }
+            });
         } catch (error) {
             console.log(error);
         }
