@@ -23,9 +23,10 @@ module.exports = {
         }
     },
     getAllUsers: async () => {
-        let user = [];
+        let users = [];
         try {
-            return await db.User.findAll();
+            users = await db.User.findAll();
+            return users;
         } catch (error) {
             console.log(error);
         }
@@ -37,6 +38,31 @@ module.exports = {
                     id
                 }
             });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    getUserById: async (id) => {
+        let user = {};
+        try {
+            user = await db.User.findOne({
+                where: {
+                    id
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    updateUser: async (id, email, username) => {
+        try {
+            await db.User.update(
+                { email, username },
+                {
+                    where: {
+                        id
+                    }
+                });
         } catch (error) {
             console.log(error);
         }
