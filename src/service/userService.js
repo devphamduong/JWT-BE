@@ -35,8 +35,6 @@ module.exports = {
             raw: true,
             nest: true
         });
-        console.log(user);
-        console.log(roles);
         let users = [];
         try {
             users = await db.User.findAll();
