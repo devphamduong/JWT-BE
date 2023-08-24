@@ -1,7 +1,7 @@
 module.exports = {
-    testApi: (req, res) => {
+    handleRegister: (req, res) => {
         return res.status(200).json({
-            message: 'ok'
+            message: req.body
         });
-    }
+    },
 };
