@@ -1,6 +1,7 @@
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
 import db from '../models/index';
+import { Op } from 'sequelize';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -26,6 +27,10 @@ const checkPhoneExist = async (phone) => {
         return true;
     }
     return false;
+};
+
+const checkPassword = (password, hashPassword) => {
+    return bcrypt.compareSync(password, hashPassword);
 };
 
 module.exports = {
@@ -54,13 +59,47 @@ module.exports = {
             });
             return {
                 EM: 'User is created successfully',
-                EC: 1
+                EC: 0
             };
         } catch (error) {
             console.log(error);
             return {
                 EM: 'Something went wrong',
                 EC: -2
+            };
+        }
+    },
+    loginUser: async (data) => {
+        try {
+            let user = await db.User.findOne({
+                where: {
+                    [Op.or]: [
+                        { email: data.emailOrPhone },
+                        { phone: data.emailOrPhone }
+                    ]
+                }
+            });
+            if (user) {
+                let isCorrectPassword = checkPassword(data.password, user.password);
+                if (isCorrectPassword) {
+                    return {
+                        EM: 'OK',
+                        EC: 0,
+                        DT: ''
+                    };
+                }
+            }
+            return {
+                EM: 'Your email/phone or password is incorrect',
+                EC: 1,
+                DT: ''
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                EM: 'Something went wrong',
+                EC: -2,
+                DT: ''
             };
         }
     },

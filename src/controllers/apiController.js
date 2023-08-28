@@ -25,4 +25,28 @@ module.exports = {
             });
         }
     },
+    handleLogin: async (req, res) => {
+        const { emailOrPhone, password } = req.body;
+        try {
+            if (!emailOrPhone || !password) {
+                return res.status(200).json({
+                    EM: 'Missing required parameters',
+                    EC: '1',
+                    DT: ''
+                });
+            }
+            let result = await accountService.loginUser(req.body);
+            return res.status(200).json({
+                EM: result.EM,
+                EC: result.EC,
+                DT: result.DT
+            });
+        } catch (error) {
+            return res.status(500).json({
+                EM: 'Error from server',
+                EC: '-1',
+                DT: ''
+            });
+        }
+    },
 };
