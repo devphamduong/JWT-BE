@@ -68,6 +68,32 @@ module.exports = {
             };
         }
     },
+    getUserPaginate: async (page, limit) => {
+        try {
+            let offset = (page - 1) * limit;
+            let { count, rows } = await db.User.findAndCountAll({
+                offset, limit
+            });
+            let totalPage = Math.ceil(count / limit);
+            let data = {
+                totalPage,
+                totalRow: count,
+                users: rows
+            };
+            return {
+                EM: 'OK',
+                EC: 0,
+                DT: data
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                EM: 'Error from service',
+                EC: -1,
+                DT: []
+            };
+        }
+    },
     deleteUser: async (id) => {
         try {
             await db.User.destroy({
