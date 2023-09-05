@@ -11,10 +11,10 @@ module.exports = {
                     DT: ''
                 });
             }
-            let result = await accountService.createUser(req.body);
+            let data = await accountService.createUser(req.body);
             return res.status(200).json({
-                EM: result.EM,
-                EC: result.EC,
+                EM: data.EM,
+                EC: data.EC,
                 DT: ''
             });
         } catch (error) {
@@ -35,11 +35,11 @@ module.exports = {
                     DT: ''
                 });
             }
-            let result = await accountService.loginUser(req.body);
+            let data = await accountService.loginUser(req.body);
             return res.status(200).json({
-                EM: result.EM,
-                EC: result.EC,
-                DT: result.DT
+                EM: data.EM,
+                EC: data.EC,
+                DT: data.DT
             });
         } catch (error) {
             return res.status(500).json({
