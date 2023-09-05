@@ -72,7 +72,9 @@ module.exports = {
         try {
             let offset = (page - 1) * limit;
             let { count, rows } = await db.User.findAndCountAll({
-                offset, limit
+                offset, limit,
+                attributes: ["id", "email", "username", "phone", "sex"],
+                include: { model: db.Group, attributes: ["name", "description"] }
             });
             let totalPage = Math.ceil(count / limit);
             let data = {
@@ -96,13 +98,32 @@ module.exports = {
     },
     deleteUser: async (id) => {
         try {
-            await db.User.destroy({
+            let user = await db.User.findOne({
                 where: {
                     id
                 }
             });
+            if (user) {
+                await user.destroy();
+                return {
+                    EM: 'Delete successfully',
+                    EC: 0,
+                    DT: []
+                };
+            } else {
+                return {
+                    EM: 'Delete failed or user not found',
+                    EC: 1,
+                    DT: []
+                };
+            }
         } catch (error) {
             console.log(error);
+            return {
+                EM: 'Error from service',
+                EC: -1,
+                DT: []
+            };
         }
     },
     updateUser: async (data) => {

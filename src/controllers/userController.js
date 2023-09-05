@@ -62,6 +62,7 @@ module.exports = {
     },
     deleteFunc: async (req, res) => {
         try {
+            let data = await userApiService.deleteUser(req.body.id);
             return res.status(200).json({
                 EM: data.EM,
                 EC: data.EC,
