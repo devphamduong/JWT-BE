@@ -30,6 +30,7 @@ module.exports = {
     },
     createFunc: async (req, res) => {
         try {
+            let data = await userApiService.createUser(req.body);
             return res.status(200).json({
                 EM: data.EM,
                 EC: data.EC,

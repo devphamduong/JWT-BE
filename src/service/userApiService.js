@@ -28,8 +28,17 @@ module.exports = {
             await db.User.create({
                 email: data.email,
                 password: hashedPassword,
-                username: data.username
+                username: data.username,
+                phone: data.phone,
+                sex: data.sex,
+                address: data.address,
+                groupId: data.group,
             });
+            return {
+                EM: 'Create user successfully',
+                EC: 0,
+                DT: []
+            };
         } catch (error) {
             console.log(error);
             return {
