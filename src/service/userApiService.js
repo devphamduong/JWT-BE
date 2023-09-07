@@ -1,4 +1,3 @@
-import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
 import db from '../models/index';
 
@@ -55,7 +54,7 @@ module.exports = {
             } else {
                 return {
                     EM: 'OK',
-                    EC: 0,
+                    EC: 1,
                     DT: []
                 };
             }
