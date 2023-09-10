@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import db from '../models/index';
+import { checkEmailExist, checkPhoneExist } from './accountService';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -7,35 +8,30 @@ const hashPassword = (password) => {
     return bcrypt.hashSync(password, salt);
 };
 
-const getUserById = async (id) => {
-    let user = {};
-    try {
-        user = await db.User.findOne({
-            where: {
-                id
-            }
-        });
-        return user;
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 module.exports = {
     createUser: async (data) => {
-        let hashedPassword = hashPassword(data.password);
         try {
-            await db.User.create({
-                email: data.email,
-                password: hashedPassword,
-                username: data.username,
-                phone: data.phone,
-                sex: data.sex,
-                address: data.address,
-                groupId: data.group,
-            });
+            let isExistEmail = await checkEmailExist(data.email);
+            if (isExistEmail) {
+                return {
+                    EM: 'This email address is already in use on another account',
+                    EC: 1,
+                    DT: 'email'
+                };
+            }
+            let isExistPhone = await checkPhoneExist(data.phone);
+            if (isExistPhone) {
+                return {
+                    EM: 'This phone number is already in use on another account',
+                    EC: 1,
+                    DT: 'phone'
+                };
+            }
+            let hashedPassword = hashPassword(data.password);
+            data.password = hashedPassword;
+            await db.User.create(data);
             return {
-                EM: 'Create user successfully',
+                EM: 'User is created successfully',
                 EC: 0,
                 DT: []
             };
@@ -81,8 +77,9 @@ module.exports = {
             let offset = (page - 1) * limit;
             let { count, rows } = await db.User.findAndCountAll({
                 offset, limit,
-                attributes: ["id", "email", "username", "phone", "sex"],
-                include: { model: db.Group, attributes: ["name", "description"] }
+                attributes: ["id", "email", "username", "phone", "sex", "address"],
+                include: { model: db.Group, attributes: ["name", "description", "id"] },
+                order: [['id', 'DESC']]
             });
             let totalPage = Math.ceil(count / limit);
             let data = {
@@ -136,20 +133,45 @@ module.exports = {
     },
     updateUser: async (data) => {
         try {
-            let user = getUserById(data.id);
+            if (!data.groupId) {
+                return {
+                    EM: 'Group must be selected',
+                    EC: 1,
+                    DT: 'group'
+                };
+            }
+            let user = await db.User.findOne({
+                where: {
+                    id: data.id
+                }
+            });
             if (user) {
-                await db.User.update(
-                    { email: data.email, username: data.username },
+                await user.update(
                     {
-                        where: {
-                            id: user.id
-                        }
+                        username: data.username,
+                        address: data.address,
+                        sex: data.sex,
+                        groupId: data.groupId
                     });
+                return {
+                    EM: 'User is updated successfully',
+                    EC: 0,
+                    DT: ''
+                };
             } else {
-
+                return {
+                    EM: 'User not found',
+                    EC: 2,
+                    DT: ''
+                };
             }
         } catch (error) {
             console.log(error);
+            return {
+                EM: 'Error from service',
+                EC: -1,
+                DT: []
+            };
         }
     }
 };

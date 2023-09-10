@@ -40,14 +40,16 @@ module.exports = {
             if (isExistEmail) {
                 return {
                     EM: 'This email address is already in use on another account',
-                    EC: 1
+                    EC: 1,
+                    DT: []
                 };
             }
             let isExistPhone = await checkPhoneExist(data.phone);
             if (isExistPhone) {
                 return {
                     EM: 'This phone number is already in use on another account',
-                    EC: 1
+                    EC: 1,
+                    DT: []
                 };
             }
             let hashedPassword = hashPassword(data.password);
@@ -59,7 +61,8 @@ module.exports = {
             });
             return {
                 EM: 'User is created successfully',
-                EC: 0
+                EC: 0,
+                DT: []
             };
         } catch (error) {
             console.log(error);
@@ -103,4 +106,22 @@ module.exports = {
             };
         }
     },
+    checkEmailExist: async (email) => {
+        let user = await db.User.findOne({
+            where: { email }
+        });
+        if (user) {
+            return true;
+        }
+        return false;
+    },
+    checkPhoneExist: async (phone) => {
+        let user = await db.User.findOne({
+            where: { phone }
+        });
+        if (user) {
+            return true;
+        }
+        return false;
+    }
 };
